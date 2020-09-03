@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net.Security;
 using System.Runtime.InteropServices;
@@ -27,7 +28,6 @@ namespace HIDUPSResponder
         private AppSettings _appSettings;
         private string _configFile;
         private byte[] _configHash;
-        private ulong _statusChangeTick;
 
         // System uptime
         [DllImport("kernel32")]
@@ -43,8 +43,6 @@ namespace HIDUPSResponder
             _logger = logger;
             _services = services;
 
-            _statusChangeTick = ulong.MaxValue;
-
             // Set up configuration file change detection
             ConfigFileChangeSetup();
 
@@ -56,6 +54,8 @@ namespace HIDUPSResponder
             ACLineStatus currentACLineStatus = Win32PowerManager.GetSystemPowerStatus().ACLineStatus;
             Task currentExecutionTask = null;
             CancellationTokenSource currentCancellationTokenSource = new CancellationTokenSource();
+
+            _logger.LogInformation($"Executing. Working directory is {Directory.GetCurrentDirectory()}");
 
             // Use a polling loop for now. There is a way to subscribe to events but unsure of the best way to implement this.
             while (!stoppingToken.IsCancellationRequested)

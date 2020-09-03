@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using HIDUPSResponder.Models;
 using Microsoft.Extensions.Configuration;
@@ -10,10 +11,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Serilog;
 
+[assembly: AssemblyVersion("1.0.0.*")]
+
 namespace HIDUPSResponder
 {
     public class Program
     {
+        
         public static void Main(string[] args)
         {
 
@@ -26,9 +30,7 @@ namespace HIDUPSResponder
                 {
                     // Set working directory if in production
                     if (!hostContext.HostingEnvironment.IsDevelopment())
-                    {
                         Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-                    }
 
                     IConfiguration configuration = hostContext.Configuration;
                     services.Configure<AppSettings>(configuration.GetSection("AppSettings"));

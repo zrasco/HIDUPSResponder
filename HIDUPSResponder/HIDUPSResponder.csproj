@@ -1,16 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<Deterministic>False</Deterministic>
     <UserSecretsId>dotnet-HIDUPSResponder-AD2BA3E8-7406-4413-8498-EF99F0BA8C3B</UserSecretsId>
-	<UseWindowsForms>true</UseWindowsForms>
+    <Configurations>Debug;Release;Release_Static</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="logs\**" />
+    <Compile Remove="publish\**" />
     <Content Remove="logs\**" />
+    <Content Remove="publish\**" />
     <EmbeddedResource Remove="logs\**" />
+    <EmbeddedResource Remove="publish\**" />
     <None Remove="logs\**" />
+    <None Remove="publish\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,5 +25,14 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="winsvc-install.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="winsvc-uninstall.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

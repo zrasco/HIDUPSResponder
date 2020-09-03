@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>d50c745c-554b-4df2-9061-7c02eee883c8</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputName>HIDUPSResponderSetup</OutputName>
+    <OutputType>Package</OutputType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release_Static|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="HIDUPSResponder.wxs" />
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HIDUPSResponder\HIDUPSResponder.csproj">
+      <Name>HIDUPSResponder</Name>
+      <Project>{1070e2c3-2f4d-4bc6-9a62-8840b748ae08}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="RemovePdbs.xslt" />
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+  <!--
+	To modify your build process, add your task inside one of the targets below and uncomment it.
+	Other similar extension points exist, see Wix.targets.
+	<Target Name="BeforeBuild">
+	</Target>
+	<Target Name="AfterBuild">
+	</Target>
+	-->
+  <Target Name="BeforeBuild">
+	<Exec 	Condition="'$(Configuration)' != 'Release_Static' " 
+			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) --output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
+	<Exec 	Condition="'$(Configuration)' == 'Release_Static' " 
+			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) -r win10-x64 --output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
+    <PropertyGroup>
+      <LinkerBaseInputPaths>..\HIDUPSResponder\publish\$(Configuration)_win10-x64\</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=..\HIDUPSResponder\publish\$(Configuration)_win10-x64\</DefineConstants>
+    </PropertyGroup>
+    <HeatDirectory OutputFile="HIDUPSResponder.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="HIDUPSResponder_Project" SuppressCom="true" Directory="..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
+  </Target>
+</Project>
