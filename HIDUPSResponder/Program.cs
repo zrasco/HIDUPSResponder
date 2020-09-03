@@ -16,6 +16,7 @@ namespace HIDUPSResponder
     {
         public static void Main(string[] args)
         {
+
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -23,8 +24,13 @@ namespace HIDUPSResponder
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    IConfiguration configuration = hostContext.Configuration;
+                    // Set working directory if in production
+                    if (!hostContext.HostingEnvironment.IsDevelopment())
+                    {
+                        Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
+                    }
 
+                    IConfiguration configuration = hostContext.Configuration;
                     services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
                     // Add serilog support

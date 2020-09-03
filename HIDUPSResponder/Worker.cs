@@ -131,22 +131,28 @@ namespace HIDUPSResponder
 
                                         _logger.LogInformation($"Starting child process ({command})...");
 
-                                        process.Start();
-
-                                        // Check for task cancellation once a second. If task was cancelled, kill the process
-                                        const int PROC_POLL_INTERVAL = 1000;
-
-                                        while (!process.WaitForExit(PROC_POLL_INTERVAL))
+                                        try
                                         {
-                                            if (currentCancellationTokenSource.Token.IsCancellationRequested)
+                                            process.Start();
+
+                                            // Check for task cancellation once a second. If task was cancelled, kill the process
+                                            const int PROC_POLL_INTERVAL = 1000;
+
+                                            while (!process.WaitForExit(PROC_POLL_INTERVAL))
                                             {
-                                                procKilled = true;
-                                                process.Kill(true);
+                                                if (currentCancellationTokenSource.Token.IsCancellationRequested)
+                                                {
+                                                    procKilled = true;
+                                                    process.Kill(true);
+                                                }
                                             }
+
+                                            _logger.LogInformation($"Child process {(procKilled ? "killed" : "ended")} ({command}).");
                                         }
-
-                                        _logger.LogInformation($"Child process {(procKilled ? "killed" : "ended")} ({command}).");
-
+                                        catch (Exception ex)
+                                        {
+                                            _logger.LogError(ex, "Unable to start process.");
+                                        }
                                     }
                                 }
                             }
