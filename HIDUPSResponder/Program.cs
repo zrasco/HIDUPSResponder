@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace HIDUPSResponder
 {
@@ -25,14 +26,17 @@ namespace HIDUPSResponder
                     IConfiguration configuration = hostContext.Configuration;
 
                     services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
-                    //AppSettings appSettings = configuration.GetSection("AppSettings").Get<AppSettings>();   
 
-                    //services.AddSingleton(appSettings);
-
-                    //services.AddTransient<IOptionsSnapshot<AppSettings>>();
+                    // Add serilog support
+                    Log.Logger = new LoggerConfiguration()
+                        .ReadFrom.Configuration(configuration)
+                        .Enrich.FromLogContext()
+                        .CreateLogger();
 
                     services.AddSingleton<IConfiguration>(configuration);
                     services.AddHostedService<Worker>();
-                }).UseWindowsService();
+                })
+            .UseSerilog()
+            .UseWindowsService();
     }
 }
