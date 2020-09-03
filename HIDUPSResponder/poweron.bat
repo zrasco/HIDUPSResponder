@@ -1,0 +1,1 @@
+echo Power On! > C:\users\zeb\status.txt

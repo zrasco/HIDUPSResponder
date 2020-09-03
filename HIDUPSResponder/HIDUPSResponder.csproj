@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-HIDUPSResponder-AD2BA3E8-7406-4413-8498-EF99F0BA8C3B</UserSecretsId>
+	<UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.7" />
+  </ItemGroup>
+</Project>

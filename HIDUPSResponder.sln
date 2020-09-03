@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HIDUPSResponder", "HIDUPSResponder\HIDUPSResponder.csproj", "{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DE76F56F-7201-4D07-AEC3-E965C17BA9C8}
+	EndGlobalSection
+EndGlobal

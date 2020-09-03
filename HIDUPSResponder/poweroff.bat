@@ -1,0 +1,1 @@
+echo Power Off! > C:\users\zeb\status.txt

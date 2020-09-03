@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "HIDUPSResponder": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
