@@ -4,16 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management;
-using System.Net.Security;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using HIDUPSResponder.Models;
 using HIDUPSResponder.Services;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging;
@@ -32,6 +27,7 @@ namespace HIDUPSResponder
         private byte[] _configHash;
         private ManagementEventWatcher _managementEventWatcher;
         private CancellationTokenSource _runningTasksCancellationTokenSource;
+        bool _powerOffDelayed;
 
         // System uptime
         [DllImport("kernel32")]
@@ -51,6 +47,7 @@ namespace HIDUPSResponder
             _runningTasksCancellationTokenSource = new CancellationTokenSource();
 
             // Monitor power events
+            _powerOffDelayed = false;
             InitPowerEvents();
 
             // Set up configuration file change detection
@@ -74,6 +71,7 @@ namespace HIDUPSResponder
 
         private void PowerEventArrive(object sender, EventArrivedEventArgs e)
         {
+            // Credit: https://stackoverflow.com/questions/3948884/detect-power-state-change
             bool exitLoop = false;
             Dictionary<string, string> powerValues = new Dictionary<string, string>
                         {
@@ -93,23 +91,32 @@ namespace HIDUPSResponder
                     {
                         List<string> executeCommands = null;
                         bool cancellingPowerOff = false;
-                        exitLoop = true;
                         int taskDelay = 0;
-
                         var powerStatus = Win32PowerManager.GetSystemPowerStatus();
                         ACLineStatus newACLineStatus = powerStatus.ACLineStatus;
+
+                        // We'll be done with the event after this
+                        exitLoop = true;
 
                         if (newACLineStatus == ACLineStatus.Online)
                         {
                             // Power was off but came back on
                             executeCommands = _appSettings.PowerOnCommands;
-                            _logger.LogInformation($"Power back on.");
 
                             // Cancel any running tasks and refresh cancellation token source
 
                             // TODO: Code below should only run if there is a currently running power off task
-                            _runningTasksCancellationTokenSource.Cancel();
-                            cancellingPowerOff = true;
+                            if (_powerOffDelayed)
+                            {
+                                _powerOffDelayed = false;
+                                _runningTasksCancellationTokenSource.Cancel();
+                                cancellingPowerOff = true;
+
+                                _logger.LogInformation($"Power back on within ({_appSettings.SecondsBeforePowerOffExecution}) seconds of power off. Skipping execution of power on script(s).");
+                            }
+                            else
+                                _logger.LogInformation($"Power back on. Power on script(s) execution beginning...");
+
 
                         }
                         else if (newACLineStatus == ACLineStatus.Offline)
@@ -117,8 +124,9 @@ namespace HIDUPSResponder
                             // Power was on but then went off
                             executeCommands = _appSettings.PowerOffCommands;
                             taskDelay = _appSettings.SecondsBeforePowerOffExecution * 1000;
+                            _powerOffDelayed = true;
 
-                            _logger.LogInformation($"Power is off. Waiting ({_appSettings.SecondsBeforePowerOffExecution}) seconds to begin...");
+                            _logger.LogInformation($"Power is off. Waiting ({_appSettings.SecondsBeforePowerOffExecution}) seconds to begin execution of script(s)...");
                         }
 
                         // Execute the relevant commands
@@ -149,10 +157,12 @@ namespace HIDUPSResponder
                                             _logger.LogDebug($"Task ID#{delayTask.Id} (delay task) cancelled.");
                                         }
 
+                                        _powerOffDelayed = false;
+
                                         // Cancel the outer task if the inner one was cancelled
                                         localCancelToken.Token.ThrowIfCancellationRequested();
 
-                                        _logger.LogDebug($"Task ID#{delayTask.Id} (delay task) completed.");
+                                        _logger.LogDebug($"Task ID#{delayTask.Id} (delay task) completed.");                                        
                                     }
 
                                     for (int x = 0; x < executeCommands.Count && !localCancelToken.Token.IsCancellationRequested; x++)
