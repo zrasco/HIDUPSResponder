@@ -63,4 +63,17 @@
     </PropertyGroup>
     <HeatDirectory OutputFile="HIDUPSResponder.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="HIDUPSResponder_Project" SuppressCom="true" Directory="..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
   </Target>
+  <Target Name="AfterBuild">
+
+    <GetAssemblyIdentity AssemblyFiles="..\HIDUPSResponder\publish\$(Configuration)_win10-x64\HIDUPSResponder.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion"/>
+    </GetAssemblyIdentity>
+	
+    <Copy 	Condition="'$(Configuration)' != 'Release_Static' " 
+			SourceFiles="$(TargetDir)\$(OutputName).msi" DestinationFiles="$(TargetDir)\$(OutputName)_%(AssemblyVersion.Version).msi" />
+	<Copy 	Condition="'$(Configuration)' == 'Release_Static' " 
+			SourceFiles="$(TargetDir)\$(OutputName).msi" DestinationFiles="$(TargetDir)\$(OutputName)_StandAlone_%(AssemblyVersion.Version).msi" />
+			
+    <Delete Files="$(TargetDir)\$(OutputName).msi" />
+  </Target>
 </Project>

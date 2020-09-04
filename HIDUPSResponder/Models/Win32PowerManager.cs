@@ -8,49 +8,49 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 public enum ACLineStatus : byte
-	{
+{
 	Offline = 0,
 	Online = 1,
 	Unknown = 255,
-	}
+}
 
 public enum BatteryFlag : byte
-	{
+{
 	High = 1,
 	Low = 2,
 	Critical = 4,
 	Charging = 9,
 	NoSystemBattery = 128,
 	Unknown = 255
-	}
+}
 
 // mirrors the unmanaged counterpart
 [StructLayout(LayoutKind.Sequential)]
 public class SystemPowerStatus
-	{
+{
 	public ACLineStatus ACLineStatus;
 	public BatteryFlag BatteryFlag;
 	public Byte BatteryLifePercent;
 	public Byte Reserved1;
 	public Int32 BatteryLifeTime;
 	public Int32 BatteryFullLifeTime;
-	}
+}
 
 class Win32PowerManager
-	{
+{
 	[DllImport("Kernel32")]
 	private static extern Boolean GetSystemPowerStatus(SystemPowerStatus sps);
 
 	public static SystemPowerStatus GetSystemPowerStatus()
-		{
+	{
 		SystemPowerStatus sps = new SystemPowerStatus();
 		GetSystemPowerStatus(sps);
 		return sps;
-		}
+	}
 
 	[Flags]
 	public enum ExitWindowsBits : uint
-		{
+	{
 		// ONE of the following five:
 		LogOff = 0x00,
 		ShutDown = 0x01,
@@ -60,11 +60,11 @@ class Win32PowerManager
 		// plus AT MOST ONE of the following two:
 		Force = 0x04,
 		ForceIfHung = 0x10,
-		}
+	}
 
 	[Flags]
 	public enum ShutdownReasonBits : uint
-		{
+	{
 		MajorApplication = 0x00040000,
 		MajorHardware = 0x00010000,
 		MajorLegacyApi = 0x00070000,
@@ -103,15 +103,15 @@ class Win32PowerManager
 
 		FlagUserDefined = 0x40000000,
 		FlagPlanned = 0x80000000
-		}
+	}
 
 	[DllImport("user32.dll")]
 	static extern bool ExitWindowsEx(ExitWindowsBits uFlags, ShutdownReasonBits dwReason);
 
 	[STAThread]
 	public static bool ShutDown()
-		{
+	{
 		return ExitWindowsEx(ExitWindowsBits.PowerOff | ExitWindowsBits.Force,
 						ShutdownReasonBits.MajorPower | ShutdownReasonBits.MinorCordUnplugged);
-		}
 	}
+}

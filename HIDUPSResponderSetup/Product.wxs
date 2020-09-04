@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 	<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Id="*" Name="HID UPS Responder" Language="1033" Version="!(bind.FileVersion.filC47644A0990E401925A5FC11380A9917)" Manufacturer="Zeb Inc." UpgradeCode="311f4cde-e7d5-4d50-bdba-903c35810a28">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="Version:!(bind.FileVersion.filC47644A0990E401925A5FC11380A9917)" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes" />
