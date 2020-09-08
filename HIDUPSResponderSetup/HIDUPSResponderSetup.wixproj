@@ -52,17 +52,46 @@
 	<Target Name="AfterBuild">
 	</Target>
 	-->
+  <!--
   <Target Name="BeforeBuild">
+	
 	<Exec 	Condition="'$(Configuration)' != 'Release_Static' " 
-			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) --output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
+			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) - -output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
 	<Exec 	Condition="'$(Configuration)' == 'Release_Static' " 
-			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) -r win10-x64 --output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
-    <PropertyGroup>
+			Command="dotnet publish ..\HIDUPSResponder\HIDUPSResponder.csproj -c $(Configuration) -r win10-x64 - -output ..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" />
+    
+	<PropertyGroup>
       <LinkerBaseInputPaths>..\HIDUPSResponder\publish\$(Configuration)_win10-x64\</LinkerBaseInputPaths>
       <DefineConstants>BasePath=..\HIDUPSResponder\publish\$(Configuration)_win10-x64\</DefineConstants>
     </PropertyGroup>
     <HeatDirectory OutputFile="HIDUPSResponder.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="HIDUPSResponder_Project" SuppressCom="true" Directory="..\HIDUPSResponder\publish\$(Configuration)_win10-x64\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
   </Target>
+  -->
+  
+  <!-- Github release and static release -->
+  <Target Name="GitHub_Release">
+  	<PropertyGroup>
+	  <Configuration>Release</Configuration>
+      <LinkerBaseInputPaths>..\publish\Release_win10-x64\</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=..\publish\Release_win10-x64\</DefineConstants>
+	  <Outputs></Outputs>
+    </PropertyGroup>
+	<HeatDirectory OutputFile="HIDUPSResponder.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="HIDUPSResponder_Project" SuppressCom="true" Directory="..\publish\Release_win10-x64\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
+	<CallTarget Targets="Build">
+		<Output TaskParameter="TargetOutputs" PropertyName="Outputs"/>
+	</CallTarget>
+	<Message Text="Outputs=%(Outputs)"></Message>
+	
+  </Target>
+    <Target Name="GitHub_Release_Static">
+  	<PropertyGroup>
+      <LinkerBaseInputPaths>..\publish\Release_Static_win10-x64\</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=..\publish\Release_Static_win10-x64\</DefineConstants>
+    </PropertyGroup>
+	<HeatDirectory OutputFile="HIDUPSResponder.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="HIDUPSResponder_Project" SuppressCom="true" Directory="..\publish\Release_Static_win10-x64\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" Transforms="RemovePdbs.xslt" />
+  </Target>
+  
+  <!--
   <Target Name="AfterBuild">
 
     <GetAssemblyIdentity AssemblyFiles="..\HIDUPSResponder\publish\$(Configuration)_win10-x64\HIDUPSResponder.dll">
@@ -76,4 +105,5 @@
 			
     <Delete Files="$(TargetDir)\$(OutputName).msi" />
   </Target>
+  -->
 </Project>

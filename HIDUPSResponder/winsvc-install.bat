@@ -1,5 +1,5 @@
 @echo off
 echo Installing service...
-sc create HIDUPSResponder BinPath="C:\Program Files (x86)\HID UPS Responder\HIDUPSResponder.exe" start=auto DisplayName="HID UPS Responder service"
+sc create HIDUPSResponder BinPath="%~dp0HIDUPSResponder.exe" start=auto DisplayName="HID UPS Responder service"
 echo Starting service...
 sc start HIDUPSResponder
