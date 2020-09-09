@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+  
+	<!-- Imported variables section. Default values should be set here for when the project is built from within VS. -->
+	
+    <!-- Logic to figure out if we're doing a framework-dependent or static build. Do framework-dependent by default -->
+    <!-- Note that these must match the calling property values exactly -->
+    <BuildType Condition="'$(BuildType)' == '' ">Framework-dependent</BuildType>
+    <BuildDirModifier Condition="'$(BuildType)' == 'Standalone'">_Standalone</BuildDirModifier>
+	<Platform Condition="'$(Platform)' == ''">x86</Platform>
+	<Architecture Condition="'$(Architecture)' == ''">win10-$(Platform)</Architecture>
+	<ProjectName Condition="'$(ProjectName)' == ''">HIDUPSResponder</ProjectName>
+	<PublishDir Condition="'$(PublishDir)' == ''">..\..\$(ProjectName)\build\publish\</PublishDir>
+	
+	<!-- This line suppresses the warning messages you get from msbuild -->
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+	
+	<!-- This will be the base name of the output file -->
+	<OutputName>$(ProjectName)Setup</OutputName>
+	
+	<!-- Default to Debug|x86 if no configuration or platform was given -->
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+	<DebugDirModifier Condition="'$(Configuration)' == 'Debug'">_Debug</DebugDirModifier>
+	
+	<!-- Now we can finally determine the base path -->
+	<MyBasePath>$(PublishDir)$(Configuration)$(BuildDirModifier)_$(Architecture)</MyBasePath>
+	
+    <ProductVersion>3.10</ProductVersion>
+    <ProjectGuid>d50c745c-554b-4df2-9061-7c02eee883c8</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <OutputType>Package</OutputType>
+    <Name>WiX Setup</Name>
+  </PropertyGroup>
+  
+  <!-- Define our intermediate output paths here. Typical Debug/Release setup -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>Debug</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="$(ProjectName).wxs" />
+    <Compile Include="Product.wxs" />
+  </ItemGroup>
+
+  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
+  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
+    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
+  </Target>
+
+  <!-- Steps to execute before build -->
+  <Target Name="BeforeBuild">
+    <PropertyGroup>
+      <LinkerBaseInputPaths>$(MyBasePath)</LinkerBaseInputPaths>
+      <DefineConstants>BasePath=$(MyBasePath)</DefineConstants>
+    </PropertyGroup>
+    <HeatDirectory OutputFile="$(ProjectName).wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="$(ProjectName)_Project" SuppressCom="true" Directory="$(MyBasePath)" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
+  </Target>
+
+  <!-- Steps to execute after build, but only if called from the Daily.targets file -->
+
+  <Target Name="AfterBuild" Condition="'$(FromDailyTargets)' != ''">
+	<Message Text="BuildType==$(BuildType)"/>
+    <Message Text="Executing AfterBuild Target. Configuration==$(Configuration)$(BuildDirModifier)"/>
+    <!-- Get version number of assembly -->
+    <GetAssemblyIdentity AssemblyFiles="$(MyBasePath)\$(ProjectName).dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
+    </GetAssemblyIdentity>
+
+    <PropertyGroup>
+      <VersionNbr>$([System.Text.RegularExpressions.Regex]::Match(%(AssemblyVersion.Version), '(\d+)\.(\d+)\.(\d+)'))</VersionNbr>
+    </PropertyGroup>
+
+    <Copy SourceFiles="$(TargetDir)\$(OutputName).msi" DestinationFiles="$(PublishDir)$(OutputName)$(BuildDirModifier)_$(DebugModifier)$(Platform)_v$(VersionNbr).msi" />
+    <Delete Files="$(TargetDir)\$(OutputName).msi" />
+  </Target>
+</Project>

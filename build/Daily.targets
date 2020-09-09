@@ -1,0 +1,68 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="Daily">
+		<Message Text="Executing Daily build ($(Configuration))..."/>
+
+    <PropertyGroup>
+      
+      <!-- Make sure this has the trailing slash! Keep it as .\publish by default because it appears in the default .gitignore.
+           Once we have the relative path, expand it into the fully qualified path -->
+      <PublishDir>publish\</PublishDir>
+      <PublishDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)\$(PublishDir)'))</PublishDir>
+
+      <!-- Default to Windows 10 - x86. Full list can be found at: https://docs.microsoft.com/en-us/dotnet/core/rid-catalog#windows-rids -->
+      <Platform Condition="'$(Platform)' == ''">x86</Platform> 
+      <Architecture Condition="'$(Architecture)' == ''">win10-$(Platform)</Architecture>
+
+      <!-- Location of WIX setup project -->
+      <WixProject>..\WiX Setup\WiX Setup.wixproj</WixProject>
+      
+      <!-- Project-related -->
+      <ProjectName>HIDUPSResponder</ProjectName>
+      <ProjectFile>..\$(ProjectName)\$(ProjectName).csproj</ProjectFile>
+
+      <!-- Insert Debug into the files if we need -->
+      <ZipFileModifier Condition="'$(Configuration)' == 'Debug'">_Debug</ZipFileModifier>
+      
+    </PropertyGroup>
+
+    <Message Text="PublishDir==$(PublishDir)"/>
+
+    <!-- Build both framework-dependent and standalone releases -->
+    <Exec Command="dotnet publish $(ProjectFile) -c $(Configuration) --no-self-contained -r $(Architecture) --output $(PublishDir)$(Configuration)_$(Architecture)\" />
+    <Exec Command="dotnet publish $(ProjectFile) -c $(Configuration) --self-contained -r $(Architecture) --output $(PublishDir)$(Configuration)_Standalone_$(Architecture)\" />
+
+    <!-- Once build is done, we can now get the assembly version to embed in files below -->
+    <GetAssemblyIdentity AssemblyFiles="$(PublishDir)$(Configuration)_$(Architecture)\$(ProjectName).dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersion"/>
+    </GetAssemblyIdentity>
+
+    <!-- Chop the revision number off -->
+    <PropertyGroup>
+      <VersionNbr>$([System.Text.RegularExpressions.Regex]::Match(%(AssemblyVersion.Version), '(\d+)\.(\d+)\.(\d+)'))</VersionNbr>
+		</PropertyGroup>
+		
+		<!-- Zip the completed directories -->
+		<ZipDirectory Overwrite="true" SourceDirectory="$(PublishDir)$(Configuration)_$(Architecture)" DestinationFile="$(PublishDir)$(ProjectName)_Portable$(ZipFileModifier)_$(Platform)_v$(VersionNbr).zip"></ZipDirectory>
+		<ZipDirectory Overwrite="true" SourceDirectory="$(PublishDir)$(Configuration)_Standalone_$(Architecture)" DestinationFile="$(PublishDir)$(ProjectName)_Portable$(ZipFileModifier)_Standalone_$(Platform)_v$(VersionNbr).zip"></ZipDirectory>
+		
+		<!-- Create MSI setup files -->
+    <PropertyGroup>
+      <BuildParams>
+        Configuration=$(Configuration);
+        Architecture=$(Architecture);
+        Platform=$(Platform);
+        PublishDir=$(PublishDir);
+        ProjectName=$(ProjectName);
+        FromDailyTargets=true
+      </BuildParams>
+    </PropertyGroup>
+		<MsBuild Projects="$(WixProject)" Targets="Build" Properties="BuildType=Framework-dependent;$(BuildParams)"/>
+		<MsBuild Projects="$(WixProject)" Targets="Build" Properties="BuildType=Standalone;$(BuildParams)"/>
+
+    <!-- Optional: Clean up intermediate build directories. Warning though... this breaks your ability to build the WiX project within VS!
+    <RemoveDir Directories="$(PublishDir)$(Configuration)_$(Architecture)\"/>
+    <RemoveDir Directories="$(PublishDir)$(Configuration)_Standalone_$(Architecture)\"/>
+    -->
+    
+	</Target>
+</Project>

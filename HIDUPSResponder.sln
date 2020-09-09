@@ -5,16 +5,17 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HIDUPSResponder", "HIDUPSResponder\HIDUPSResponder.csproj", "{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "HIDUPSResponderSetup", "HIDUPSResponderSetup\HIDUPSResponderSetup.wixproj", "{D50C745C-554B-4DF2-9061-7C02EEE883C8}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WiX Setup", "WiX Setup\WiX Setup.wixproj", "{D50C745C-554B-4DF2-9061-7C02EEE883C8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{398EC5FC-9FBF-4427-8442-7576E486ED5E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FFDE8453-33B7-475D-8758-06A4041844F1}"
+	ProjectSection(SolutionItems) = preProject
+		build\Daily.targets = build\Daily.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
-		Release_Static|Any CPU = Release_Static|Any CPU
-		Release_Static|x86 = Release_Static|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
@@ -23,24 +24,14 @@ Global
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Debug|x86.Build.0 = Debug|Any CPU
-		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release_Static|Any CPU.ActiveCfg = Release_Static|Any CPU
-		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release_Static|Any CPU.Build.0 = Release_Static|Any CPU
-		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release_Static|x86.ActiveCfg = Release_Static|Any CPU
-		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release_Static|x86.Build.0 = Release_Static|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|x86.ActiveCfg = Release|Any CPU
 		{1070E2C3-2F4D-4BC6-9A62-8840B748AE08}.Release|x86.Build.0 = Release|Any CPU
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Debug|Any CPU.Build.0 = Debug|x86
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Debug|x86.ActiveCfg = Debug|x86
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Debug|x86.Build.0 = Debug|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release_Static|Any CPU.ActiveCfg = Release_Static|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release_Static|Any CPU.Build.0 = Release_Static|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release_Static|x86.ActiveCfg = Release|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release_Static|x86.Build.0 = Release|x86
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release|Any CPU.ActiveCfg = Release|x86
-		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release|Any CPU.Build.0 = Release|x86
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release|x86.ActiveCfg = Release|x86
 		{D50C745C-554B-4DF2-9061-7C02EEE883C8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection

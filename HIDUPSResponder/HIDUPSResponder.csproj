@@ -4,7 +4,7 @@
 	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	<Deterministic>False</Deterministic>
     <UserSecretsId>dotnet-HIDUPSResponder-AD2BA3E8-7406-4413-8498-EF99F0BA8C3B</UserSecretsId>
-    <Configurations>Debug;Release;Release_Static</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
